@@ -1,0 +1,13 @@
+export const brl=(value)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
+export const pct=(x)=>`${Number(x||0).toLocaleString('pt-BR',{maximumFractionDigits:2})}%`;
+export const date=(s)=>s?(/^\d{4}-\d{2}-\d{2}$/.test(String(s))?String(s).split('-').reverse().join('/'):new Date(s).toLocaleDateString('pt-BR')):'—';
+export const dateTime=(s)=>s?new Date(s).toLocaleString('pt-BR'):'—';
+export const sum=(a,key)=>a.reduce((s,x)=>s+Number(typeof key==='function'?key(x):x[key]||0),0);
+export const today=()=>new Date().toISOString().slice(0,10);
+export const byPeriod=(rows,days=30,key='createdAt')=>rows.filter(x=>x[key]&&Date.parse(x[key])>=Date.now()-days*86400000);
+export const cls=(...classes)=>classes.filter(Boolean).join(' ');
+export const safeError=(err)=>err?.message||'Ocorreu um erro inesperado';
+export const deviceCost=(d)=>Number(d.acquisitionCost||d.tradeValue||0)+Number(d.laborCost||0)+sum(d.additionalCosts||[],x=>x.totalCost??x.amount??0);
+export const netProfit=(cost,price)=>Number(price||0)-Number(cost||0);
+export const margin=(cost,price)=>Number(price)>0?(Number(price)-Number(cost))/Number(price)*100:0;
+export const labels={customers:'Clientes',devices:'Aparelhos dos clientes',serviceOrders:'Ordens de serviço',products:'Produtos',sales:'Vendas',stockMovements:'Movimentações',storeDevices:'Aparelhos da loja',finance:'Financeiro',cashSessions:'Caixas',cashMovements:'Movimentações do caixa',users:'Equipe',events:'Histórico',alerts:'Alertas',serviceCatalog:'Serviços',categories:'Categorias',suppliers:'Fornecedores',settings:'Configurações'};

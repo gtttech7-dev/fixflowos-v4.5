@@ -1,0 +1,12 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function authorized(storeId) { return request.auth != null && firestore.exists(/databases/(default)/documents/memberships/$(request.auth.uid)) && firestore.get(/databases/(default)/documents/memberships/$(request.auth.uid)).data.storeId == storeId && firestore.get(/databases/(default)/documents/memberships/$(request.auth.uid)).data.active == true; }
+    match /stores/{storeId}/{path=**} {
+      allow read: if authorized(storeId);
+      allow create: if authorized(storeId) && request.resource.size < 10485760 && request.resource.contentType.matches('image/.*|application/pdf');
+      allow update, delete: if false;
+    }
+    match /{path=**} { allow read, write: if false; }
+  }
+}

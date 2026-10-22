@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Todo acesso a documentos operacionais (leitura e gravação) passa exclusivamente
+    // pela API Vercel autenticada. O Firebase Admin SDK no servidor valida token,
+    // membership, loja ativa, papel, campos e audita transações.
+    // Não há acesso direto ao Firestore pelo navegador, nem mesmo para Super Admin.
+    // Isto evita que uma leitura direta do SDK Web contorne a ocultação de custos
+    // e outras informações sensíveis aplicada às respostas da API.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,2421 @@
+PROMPT MESTRE — FIXFLOWOS
+
+1. OBJETIVO DO PROJETO
+
+Criar um SaaS completo chamado FixFlowOS, destinado à gestão de lojas de
+assistência técnica de celulares, tablets e outros dispositivos
+eletrônicos.
+
+O sistema deve ser moderno, profissional, responsivo e prioritariamente
+desenvolvido para uso em:
+
+-   celular;
+-   tablet;
+-   desktop.
+
+A experiência mobile deve ser tratada como prioridade, pois técnicos e
+vendedores utilizarão o sistema diretamente no balcão e na área técnica.
+
+O nome oficial do sistema é exclusivamente:
+
+FixFlowOS
+
+Nunca utilizar “FixFlow Pro”, “FixFlowOS Pro” ou qualquer outra
+variação.
+
+------------------------------------------------------------------------
+
+1. STACK OBRIGATÓRIA
+
+Utilizar:
+
+-   React;
+-   Vite;
+-   JavaScript;
+-   Tailwind CSS;
+-   Lucide React;
+-   React Router;
+-   Firebase Authentication;
+-   Firebase Firestore;
+-   Firebase Storage quando necessário;
+-   Firebase Admin SDK no backend;
+-   API Routes compatíveis com Vercel;
+-   Vercel para deploy.
+
+Evitar dependências desnecessárias.
+
+A arquitetura deve ser organizada para facilitar manutenção, expansão e
+correção de bugs.
+
+------------------------------------------------------------------------
+
+2. ARQUITETURA
+
+O sistema deve ser multi-tenant.
+
+Cada loja deve possuir isolamento completo dos seus dados.
+
+Estrutura conceitual:
+
+-   Super Admin;
+-   Lojas;
+-   Usuários;
+-   Clientes;
+-   Aparelhos;
+-   Ordens de Serviço;
+-   Estoque;
+-   Produtos;
+-   Vendas;
+-   Caixa;
+-   Financeiro;
+-   Equipe/RH;
+-   Assinatura/plano.
+
+Nenhum usuário de uma loja pode acessar dados de outra loja.
+
+Toda consulta e gravação de dados deve respeitar o tenantId/storeId da
+loja do usuário autenticado.
+
+------------------------------------------------------------------------
+
+3. AUTENTICAÇÃO
+
+Utilizar Firebase Authentication.
+
+Método principal:
+
+-   Email e senha.
+
+Não criar sistema próprio de armazenamento de senhas.
+
+Nunca armazenar senhas em texto puro no Firestore.
+
+Regra de senha
+
+A senha deve possuir uma regra baseada somente nos números de 1 a 9.
+
+Exemplo de caracteres permitidos:
+
+1234567890
+
+O sistema deve validar essa regra durante criação/alteração de senha
+quando aplicável.
+
+------------------------------------------------------------------------
+
+4. SUPER ADMIN
+
+REGRA FUNDAMENTAL
+
+O Super Admin NÃO deve possuir cadastro público dentro do sistema.
+
+Não criar:
+
+-   tela “Criar Super Admin”;
+-   botão “Cadastrar Super Admin”;
+-   formulário público para Super Admin;
+-   criação automática de Super Admin;
+-   script obrigatório de provisionamento;
+-   criação do Super Admin durante o primeiro acesso;
+-   criação do Super Admin pela interface normal.
+
+O Super Admin deve ser criado exclusivamente pelo Firebase.
+
+O administrador do projeto deverá:
+
+1.  acessar o Firebase Console;
+2.  acessar Firebase Authentication;
+3.  criar manualmente o usuário com email e senha;
+4.  utilizar o email autorizado para o Super Admin;
+5.  atribuir a autorização necessária no backend/Firestore para
+    reconhecer esse usuário como Super Admin.
+
+O aplicativo apenas verifica a autorização do usuário autenticado.
+
+Nunca permitir que um usuário comum consiga transformar a própria conta
+em Super Admin.
+
+Nunca confiar apenas em dados enviados pelo frontend para determinar se
+alguém é Super Admin.
+
+A autorização deve ser validada no backend e nas regras de segurança.
+
+------------------------------------------------------------------------
+
+5. PAINEL SUPER ADMIN
+
+Criar rota protegida:
+
+/super-admin
+
+Somente usuários autorizados como Super Admin podem acessar.
+
+O painel deve permitir administrar a plataforma inteira.
+
+Funcionalidades
+
+Lojas
+
+Permitir:
+
+-   criar loja;
+-   visualizar lojas;
+-   editar loja;
+-   ativar loja;
+-   suspender loja;
+-   visualizar plano;
+-   visualizar status da assinatura;
+-   visualizar período de teste;
+-   visualizar proprietário;
+-   visualizar quantidade de usuários;
+-   visualizar informações básicas de utilização.
+
+Planos
+
+Permitir:
+
+-   criar plano;
+-   editar plano;
+-   ativar/desativar plano;
+-   definir limites;
+-   definir recursos disponíveis.
+
+Assinaturas
+
+Permitir visualizar:
+
+-   plano atual;
+-   status;
+-   início;
+-   vencimento;
+-   período de teste;
+-   loja vinculada.
+
+Usuários
+
+Permitir visualizar usuários das lojas e seus papéis, respeitando as
+permissões administrativas.
+
+------------------------------------------------------------------------
+
+FINANCEIRO DA PLATAFORMA — SUPER ADMIN
+
+Criar no painel /super-admin um dashboard financeiro exclusivo do
+proprietário/administrador global da plataforma FixFlowOS. Esse painel
+controla as receitas e os custos do negócio SaaS, não os caixas ou as
+despesas operacionais das lojas clientes.
+
+O dashboard deve ter design profissional e bonito, com cartões de
+indicadores, gráficos legíveis, filtros de data e navegação simples.
+Usar dados reais persistidos no Firestore e não valores fictícios em
+produção.
+
+Indicadores principais
+
+-   faturamento total no período selecionado;
+-   valores efetivamente recebidos;
+-   valores previstos a receber;
+-   valores vencidos e ainda não recebidos;
+-   despesas pagas;
+-   despesas previstas ou pendentes;
+-   resultado/lucro estimado do período (receitas efetivas menos
+    custos/despesas efetivamente pagos, deixando explícita a
+    metodologia);
+-   receita recorrente de assinaturas, quando houver dados suficientes;
+-   quantidade de assinaturas ativas, vencidas e em período de teste.
+
+Filtros e consultas
+
+Permitir selecionar: - hoje; - últimos 7 dias; - mês atual; - mês
+anterior; - ano atual; - intervalo personalizado com data inicial e
+final.
+
+Permitir consultar quanto está previsto para receber em uma data
+específica ou em um intervalo de datas. A previsão deve ser baseada em
+cobranças, vencimentos e assinaturas registradas no sistema. Diferenciar
+visualmente previsão, valores vencidos, valores recebidos e valores
+efetivamente pagos. Não considerar uma cobrança prevista como dinheiro
+recebido.
+
+Cadastro de custos e despesas da plataforma
+
+Permitir ao Super Admin cadastrar, editar e consultar custos do negócio,
+com: - descrição; - categoria; - valor; - data de competência; -
+vencimento; - data de pagamento; - status (pendente, pago, vencido ou
+cancelado); - recorrência (não recorrente, semanal, mensal, anual ou
+outra periodicidade suportada); - observações; - vínculo opcional com
+fornecedor ou serviço.
+
+Exemplos de categorias: hospedagem, Firebase, domínio, ferramentas,
+marketing, taxas, serviços terceirizados e outros custos operacionais.
+Custos recorrentes devem gerar ocorrências futuras de forma controlada,
+sem duplicações acidentais.
+
+Regras financeiras
+
+-   Manter receitas, cobranças, despesas e pagamentos em registros
+    distintos, com identificadores e datas.
+-   Permitir registrar manualmente o recebimento ou pagamento quando não
+    existir integração de pagamento.
+-   Não afirmar que houve recebimento real sem um registro confirmado.
+-   Não inventar previsões nem assumir que todas as assinaturas serão
+    pagas.
+-   Exibir claramente os critérios utilizados nos cálculos.
+-   Permitir abrir os detalhes que compõem cada indicador e exportar
+    relatórios financeiros.
+-   Permitir anexar comprovantes aos custos/despesas, com acesso
+    protegido e armazenamento seguro.
+-   Permitir filtros por data, categoria, recorrência, status e tipo.
+-   Permitir previsões por data/período baseadas em cobranças,
+    vencimentos e assinaturas registradas, distinguindo previsto,
+    vencido e efetivamente recebido.
+-   Permitir cenários de previsão para meses futuros, claramente
+    identificados como estimativas, nunca como valores recebidos.
+-   Não misturar custos e receitas da plataforma com os dados
+    financeiros de qualquer loja.
+-   Restringir esse painel exclusivamente ao Super Admin autorizado, com
+    verificação no backend.
+-   Registrar alterações e exclusões financeiras no histórico de
+    auditoria.
+-   Preparar a arquitetura para uma futura integração com gateway de
+    pagamento, sem simular uma integração que não exista.
+
+6. PRIMEIRA LOJA
+
+A criação da primeira loja deve acontecer pelo painel do Super Admin.
+
+O Super Admin poderá:
+
+-   criar uma loja;
+-   cadastrar o proprietário;
+-   definir o plano;
+-   definir período de teste;
+-   ativar/desativar a loja.
+
+O proprietário da loja não deve se tornar Super Admin.
+
+Cada loja deve ter seu próprio ambiente lógico de dados.
+
+------------------------------------------------------------------------
+
+7. PERFIS DE USUÁRIO E PERMISSÕES
+
+Criar cinco níveis claramente separados: SUPER ADMIN, ADMIN, GERENTE,
+VENDEDOR e TÉCNICO.
+
+SUPER ADMIN
+Administrador global da plataforma FixFlowOS. Acessa /super-admin,
+administra lojas, planos, assinaturas e o financeiro da plataforma.
+Não é um usuário de loja e não deve misturar custos/receitas do SaaS com
+o financeiro das lojas clientes.
+
+ADMIN
+Administrador de uma loja específica. Possui acesso amplo aos módulos
+da própria loja, incluindo usuários, estoque, financeiro, caixa,
+configurações, indicadores, OS, clientes, vendas e relatórios. Pode
+consultar o histórico de auditoria da própria loja e analisar o
+desempenho da equipe. Não pode acessar dados de outras lojas nem
+conceder o papel de Super Admin.
+
+GERENTE
+Perfil de gestão operacional dentro de uma loja. Pode cadastrar e editar
+produtos, registrar entradas, saídas e ajustes de estoque, consultar
+custos e preços, visualizar alertas de estoque baixo, gerenciar vendas,
+consultar relatórios operacionais, atribuir técnicos às OS e acompanhar
+os consertos. Pode editar todos os campos das OS, incluindo
+cliente/aparelho, diagnóstico, serviços, peças, técnico responsável,
+orçamento, desconto, valores, pagamentos, status, datas e observações.
+Pode consultar o histórico de auditoria e indicadores operacionais da
+própria loja. Não recebe automaticamente permissão para administrar
+configurações críticas, usuários/permissões, assinaturas da plataforma
+ou dados de outras lojas. A gestão financeira administrativa da loja
+permanece sujeita às permissões do Admin. Nunca pode se tornar Super
+Admin.
+
+VENDEDOR
+Usuário operacional de atendimento e vendas. Pode cadastrar clientes,
+abrir e editar OS, realizar vendas conforme as permissões da loja,
+consultar produtos e estoque e visualizar as informações necessárias ao
+atendimento. Pode consultar o histórico de auditoria da própria loja.
+Não pode administrar configurações globais da loja.
+
+TÉCNICO
+Usuário focado na operação técnica. Pode visualizar, criar e editar OS,
+atualizar etapas técnicas, adicionar diagnóstico, observações e serviços
+executados, consultar produtos e disponibilidade do estoque. Não pode
+cadastrar, excluir ou editar produtos, movimentar ou ajustar estoque
+manualmente, criar categorias ou administrar o módulo de estoque.
+
+REGRA DE EDIÇÃO DE ORDENS DE SERVIÇO
+Todos os perfis de usuário da loja — Admin, Gerente, Vendedor e Técnico
+— podem editar uma OS. Toda criação, edição, mudança de status,
+alteração de valor, pagamento, atribuição ou cancelamento deve gerar
+evento no histórico com usuário, papel, data/hora e detalhes da
+alteração.
+
+Não exigir que vendedor ou técnico preencha manualmente, como condição
+obrigatória para salvar ou atualizar uma OS, cada insumo/consumível
+utilizado. O registro de peças/insumos vinculados à OS pode ser opcional
+ou seguir um fluxo de estoque definido pela loja, sem bloquear o
+diagnóstico ou o andamento do conserto.
+
+REGRAS GERAIS
+- Aplicar permissões na interface, backend e regras do Firestore.
+- Ocultar botões não substitui validação de autorização no backend.
+- Todos os usuários autorizados da loja podem consultar o histórico da
+  própria loja para saber quem realizou ações e o que foi alterado.
+- Toda venda, OS, movimentação de estoque e ação financeira deve
+  registrar o usuário responsável.
+- Nenhum Admin, Gerente, Vendedor ou Técnico pode conceder a si mesmo
+  privilégios superiores.
+- Validar permissões explicitamente em cada operação.
+
+8. DASHBOARD DA LOJA
+
+Criar um dashboard moderno, bonito, profissional e responsivo para cada
+loja, com visualização clara dos principais indicadores operacionais e
+financeiros da própria loja.
+
+Exibir indicadores calculados a partir de dados reais: - OS abertas; -
+OS em andamento; - OS aguardando aprovação; - OS aguardando peça; - OS
+prontas; - OS entregues; - faturamento e vendas por período; - situação
+do caixa; - estoque baixo; - quantidade de clientes; - serviços
+pendentes; - prazos e OS atrasadas; - produtividade por técnico, quando
+houver dados suficientes; - alertas importantes e atividades recentes.
+
+Incluir gráficos claros, filtros de período e atalhos para as ações mais
+utilizadas. Não sobrecarregar a interface. Os indicadores financeiros da
+loja devem permanecer separados do painel financeiro do Super Admin.
+
+Não exibir números fictícios em produção. Se não houver dados, mostrar
+estados vazios úteis e explicar que os indicadores serão preenchidos
+conforme a utilização do sistema.
+
+------------------------------------------------------------------------
+
+9. VALOR PARADO EM APARELHOS
+
+Criar uma área específica no dashboard chamada:
+
+Valor Parado em Aparelhos
+
+Essa área deve mostrar o valor financeiro atualmente vinculado às Ordens
+de Serviço/aparelhos que ainda estão dentro da operação.
+
+Exibir:
+
+-   quantidade de aparelhos;
+-   valor total;
+-   valor por status;
+-   quantidade por status;
+-   percentual por status.
+
+Exemplo de status:
+
+-   Aguardando avaliação;
+-   Aguardando aprovação;
+-   Aguardando peça;
+-   Em reparo;
+-   Pronto para retirada.
+
+Por padrão, excluir do cálculo:
+
+-   Entregue;
+-   Cancelado.
+
+Permitir visualizar detalhes e acessar as OS correspondentes.
+
+O cálculo deve utilizar valores reais armazenados nas OS e não valores
+fictícios.
+
+------------------------------------------------------------------------
+
+10. ORDENS DE SERVIÇO
+
+Criar módulo completo de OS, com criação, consulta, edição,
+acompanhamento de status e histórico.
+
+Cada OS deve possuir, conforme aplicável:
+- número único da OS;
+- cliente e telefone;
+- aparelho, marca, modelo, IMEI/número de série quando aplicável;
+- acessórios recebidos e estado físico;
+- problema relatado e diagnóstico;
+- serviço executado;
+- peças/insumos, quando registrados no fluxo escolhido pela loja;
+- técnico e usuário responsável;
+- orçamento, desconto e valor final;
+- pagamentos e situação do pagamento;
+- status, datas, observações e informações de garantia;
+- vínculo com OS original em caso de retorno/retrabalho;
+- histórico completo de alterações.
+
+Todos os perfis de loja (Admin, Gerente, Vendedor e Técnico) podem
+editar OS. Não exigir que vendedor ou técnico preencha manualmente uma
+lista de insumos/consumíveis utilizados para salvar ou atualizar a OS.
+A inclusão de peças/insumos pode ser opcional e deve seguir o fluxo de
+estoque configurado, sem impedir o registro do diagnóstico ou do
+andamento do conserto.
+
+Registrar cada alteração com usuário responsável, papel, data/hora,
+campos alterados e valores anteriores/posteriores quando aplicável.
+Manter o histórico visível para todos os usuários autorizados daquela
+loja. Não apagar o histórico quando uma OS for cancelada ou editada.
+
+STATUS
+1. Aguardando avaliação
+2. Em avaliação
+3. Orçamento enviado
+4. Aguardando aprovação
+5. Aprovado
+6. Aguardando peça
+7. Em reparo
+8. Em testes
+9. Pronto para retirada
+10. Entregue
+11. Cancelado
+
+Permitir consultar o histórico completo da OS e localizar rapidamente
+quem fez cada alteração.
+
+11. CLIENTES
+
+Criar CRUD completo de clientes.
+
+Campos:
+
+-   nome;
+-   CPF/CNPJ quando aplicável;
+-   telefone;
+-   WhatsApp;
+-   email;
+-   endereço;
+-   observações.
+
+Permitir visualizar:
+
+-   histórico de OS;
+-   compras;
+-   pagamentos;
+-   aparelhos vinculados.
+
+------------------------------------------------------------------------
+
+12. APARELHOS
+
+Cada cliente pode possuir múltiplos aparelhos.
+
+Registrar:
+
+-   tipo;
+-   marca;
+-   modelo;
+-   IMEI;
+-   número de série;
+-   cor;
+-   capacidade;
+-   acessórios;
+-   observações;
+-   histórico de manutenção.
+
+------------------------------------------------------------------------
+
+13. ESTOQUE
+
+Criar módulo de estoque completo, simples de operar e responsivo.
+
+Recursos: - cadastro e edição de produtos; - categorias; - código de
+barras; - custo unitário; - preço de venda; - quantidade atual; -
+estoque mínimo; - fornecedor; - localização; - histórico de
+movimentações; - alertas de estoque baixo.
+
+Registrar movimentações: - entrada; - saída; - ajuste; - devolução; -
+consumo de peças em OS.
+
+Sempre registrar a data, o usuário responsável, a quantidade anterior e
+posterior, a justificativa quando aplicável e a origem da movimentação.
+Não permitir quantidades negativas sem uma regra explícita e autorizada.
+
+Permissões
+
+-   Admin: pode cadastrar, editar, excluir quando seguro, movimentar e
+    configurar estoque.
+-   Gerente: pode cadastrar e editar produtos, registrar entradas,
+    saídas e ajustes, consultar custos e preços e acompanhar alertas de
+    estoque baixo.
+-   Vendedor: consulta produtos e disponibilidade; movimentações somente
+    se houver permissão explicitamente concedida.
+-   Técnico: consulta produtos e disponibilidade. O consumo de peça em
+    uma OS deve seguir o fluxo autorizado e registrar a movimentação
+    vinculada à OS, sem dar ao Técnico acesso à administração geral do
+    estoque.
+
+Exclusões de produtos com histórico devem ser evitadas; preferir
+desativar/arquivar para preservar integridade dos relatórios e
+movimentações.
+
+------------------------------------------------------------------------
+
+14. VENDAS / PDV
+
+Criar módulo de vendas (PDV) funcional.
+
+Permitir:
+- adicionar produtos e serviços;
+- selecionar cliente quando aplicável;
+- aplicar desconto conforme permissão;
+- escolher método de pagamento;
+- finalizar venda;
+- registrar devoluções, trocas e observações, incluindo eventual
+  diferença de dinheiro ou item devolvido;
+- consultar histórico e detalhes da venda.
+
+Métodos de pagamento configuráveis:
+- dinheiro;
+- PIX;
+- cartão;
+- outros;
+- troca, com campo de observação para registrar devolução de dinheiro,
+  item ou diferença envolvida.
+
+ATRIBUIÇÃO E RELATÓRIOS DE VENDAS
+Toda venda deve registrar de forma persistente o usuário que realizou a
+operação, data/hora, itens, quantidades, preços, descontos, método de
+pagamento, total, status e eventuais cancelamentos/devoluções. Salvar o
+responsável no momento da operação; não inferi-lo posteriormente pelo
+usuário atualmente conectado.
+
+O Admin da loja deve consultar relatórios e filtros por período,
+funcionário, produto, categoria e status, incluindo:
+- quem vendeu mais;
+- quantidade e valor das vendas por funcionário;
+- quais produtos/serviços cada funcionário vendeu;
+- produtos e serviços mais vendidos;
+- faturamento bruto, descontos, devoluções e total líquido;
+- histórico detalhado de cada venda;
+- cancelamentos, trocas e devoluções, com responsável e justificativa.
+
+O Gerente pode consultar relatórios operacionais de vendas conforme as
+permissões da loja. Usar dados reais e respeitar o isolamento
+multi-tenant. Nunca atribuir vendas a um funcionário sem registro.
+
+15. CAIXA
+
+Criar módulo de caixa.
+
+Recursos:
+
+-   abertura;
+-   fechamento;
+-   entradas;
+-   saídas;
+-   sangrias;
+-   suprimentos;
+-   vendas;
+-   pagamentos;
+-   conferência;
+-   histórico.
+
+Mostrar:
+
+-   saldo inicial;
+-   entradas;
+-   saídas;
+-   saldo esperado;
+-   saldo informado;
+-   diferença.
+
+------------------------------------------------------------------------
+
+16. FINANCEIRO
+
+Criar módulo financeiro.
+
+Permitir:
+
+-   contas a pagar;
+-   contas a receber;
+-   despesas;
+-   receitas;
+-   categorias;
+-   vencimentos;
+-   pagamentos;
+-   relatórios.
+
+Dashboard financeiro:
+
+-   receitas;
+-   despesas;
+-   lucro;
+-   contas vencidas;
+-   contas próximas do vencimento.
+
+------------------------------------------------------------------------
+
+17. EQUIPE / RH
+
+Criar módulo de equipe.
+
+Permitir ao Admin: - cadastrar usuários da própria loja; - editar dados
+dos usuários; - ativar/desativar usuários; - atribuir função; -
+consultar informações da equipe; - definir permissões operacionais
+quando o sistema suportar permissões personalizadas.
+
+Papéis disponíveis na loja: - Admin; - Gerente; - Vendedor; - Técnico.
+
+Nunca permitir que um Admin ou Gerente comum conceda o papel de Super
+Admin. A criação de contas e a atribuição de funções devem ser validadas
+no backend. Ao desativar um usuário, revogar seu acesso sem apagar o
+histórico de ações já realizadas por ele.
+
+------------------------------------------------------------------------
+
+18. ASSINATURAS, PLANOS E PREÇOS
+
+O sistema deve possuir estrutura real para planos SaaS. Cada loja pode
+possuir plano, status, período de teste, data de início, data de
+vencimento, limites, recursos liberados e histórico de alterações.
+
+O Super Admin deve poder criar, editar, ativar e desativar planos;
+definir limites e recursos; alterar o preço de qualquer plano sempre que
+desejar; criar preços promocionais e descontos temporários; definir
+vigência inicial/final da promoção; e consultar lojas, status, testes e
+vencimentos associados a cada plano.
+
+ALTERAÇÕES DE PREÇO
+Registrar quem alterou o preço, valor anterior, valor novo, data/hora,
+vigência e motivo opcional. Permitir definir se a mudança vale apenas
+para novas assinaturas ou também para renovações futuras. Alterações
+não podem modificar silenciosamente cobranças já pagas nem apagar o
+histórico. Mostrar claramente o preço e as condições aplicáveis a cada
+loja/assinatura.
+
+O painel deve distinguir valor contratado, valor previsto, valor
+vencido e valor efetivamente recebido. Não afirmar que um pagamento
+ocorreu sem confirmação registrada ou retorno de uma integração real.
+Nenhum usuário de loja pode alterar preços globais ou dados de
+assinaturas de outras lojas.
+
+19. HISTÓRICO DE AUDITORIA E ATIVIDADES DA LOJA
+
+Implementar histórico de auditoria pesquisável, acessível a todos os
+usuários autorizados de uma loja. Cada usuário deve conseguir consultar,
+na própria loja, quem fez o quê e quando. O histórico não pode permitir
+acesso a dados de outra loja.
+
+Registrar, quando aplicável:
+- usuário responsável e papel no momento da ação;
+- loja/tenant associado;
+- tipo de ação: criação, edição, cancelamento, aprovação, mudança de
+  status, pagamento, devolução etc.;
+- entidade afetada (OS, produto, venda, cliente, despesa, receita,
+  usuário etc.) e identificador;
+- data/hora;
+- campos alterados e valores anteriores/posteriores quando aplicável;
+- justificativa para cancelamentos, ajustes ou ações críticas.
+
+Registrar no mínimo alterações de OS; criação/edição/cancelamento de
+vendas; descontos, trocas e devoluções; movimentações e ajustes de
+estoque; alterações de preços e custos; pagamentos e mudanças
+financeiras; alterações de papéis/permissões; mudanças de configurações;
+e mudanças de planos, assinaturas e preços realizadas pelo Super Admin.
+
+Oferecer busca e filtros por data, usuário, tipo de ação e registro. O
+Admin deve conseguir revisar a atividade da equipe, incluindo quem
+vendeu, quem alterou uma OS e quem movimentou estoque. Cada usuário da
+loja vê somente o histórico da própria loja. O Super Admin vê eventos
+globais administrativos necessários à plataforma, sem misturar a
+auditoria de lojas distintas.
+
+Proteger o histórico contra alteração/exclusão por usuários comuns.
+Não registrar senhas, tokens, credenciais ou dados sensíveis
+desnecessários. Derivar a identidade do autor da sessão autenticada no
+backend, nunca confiar em nome enviado pelo frontend.
+
+20. ALERTAS OPERACIONAIS E CENTRAL DE ALERTAS
+
+Criar uma área exclusiva chamada “Alertas” ou “Central de Alertas”,
+visível e acessível a todos os usuários da loja. Exibir também um
+indicador de notificações na interface, com contagem de itens não lidos
+quando aplicável. Todos os usuários autorizados devem poder abrir a
+central e visualizar os alertas relevantes à própria loja; ações
+disponíveis respeitam o papel e as permissões.
+
+Alertas possíveis:
+- estoque abaixo do mínimo;
+- OS atrasada ou próxima do prazo;
+- OS aguardando aprovação;
+- aparelho pronto para retirada;
+- garantia próxima do fim ou retorno de garantia relevante;
+- despesas próximas do vencimento ou vencidas, conforme a permissão;
+- cobranças de assinatura próximas do vencimento ou vencidas, conforme
+  o papel;
+- falhas ou inconsistências operacionais que exijam atenção.
+
+Cada alerta deve ser baseado em dados reais, indicar motivo, data e
+gravidade, oferecer atalho ao registro relacionado quando permitido,
+respeitar o tenant, evitar duplicações excessivas e permitir marcar como
+lido/não lido e, quando adequado, resolvido. Alertas financeiros
+sensíveis devem respeitar as permissões do perfil. Alertas internos
+funcionam sem integrações externas. Não afirmar que mensagens foram
+enviadas ao cliente sem integração real de envio.
+
+21. GARANTIA E RETRABALHO
+
+Ampliar o módulo de OS para suportar controle de garantia dos serviços
+realizados.
+
+Permitir registrar: - se o serviço possui garantia; - duração da
+garantia; - data de início e fim; - condições e observações; - OS
+original relacionada; - retorno do aparelho durante o período de
+garantia; - motivo do retorno; - diagnóstico do retorno; - se o caso é
+considerado retrabalho coberto pela garantia ou um novo serviço sujeito
+a orçamento.
+
+Permitir localizar rapidamente OS com garantia ativa e consultar o
+histórico de retornos. Os prazos e valores devem ser calculados com base
+nos dados registrados. Não assumir automaticamente que todo retorno é
+coberto pela garantia: a decisão deve ser registrada por usuário
+autorizado, com justificativa quando necessário.
+
+------------------------------------------------------------------------
+
+22. TEMA
+
+Implementar:
+
+-   Dark Mode;
+-   Light Mode.
+
+Padrão
+
+O sistema deve iniciar em:
+
+Dark Mode
+
+O usuário poderá alternar para Light Mode.
+
+A preferência deve ser persistida.
+
+Toda a interface deve funcionar corretamente nos dois temas.
+
+------------------------------------------------------------------------
+
+23. DESIGN / UX
+
+Interface moderna de SaaS.
+
+Priorizar:
+
+-   clareza;
+-   velocidade;
+-   poucos cliques;
+-   componentes reutilizáveis;
+-   feedback visual;
+-   estados de carregamento;
+-   mensagens de erro claras;
+-   confirmações para ações destrutivas.
+
+No mobile:
+
+-   navegação simples;
+-   botões grandes;
+-   formulários adaptados;
+-   tabelas transformadas em cards quando necessário;
+-   ações principais facilmente acessíveis.
+
+Usar Lucide Icons.
+
+Evitar excesso de elementos visuais.
+
+------------------------------------------------------------------------
+
+24. RESPONSIVIDADE
+
+A interface deve funcionar corretamente em:
+
+-   360px;
+-   375px;
+-   390px;
+-   414px;
+-   tablets;
+-   notebooks;
+-   monitores grandes.
+
+Não permitir:
+
+-   overflow horizontal;
+-   tabelas quebrando a página;
+-   botões cortados;
+-   textos sobrepostos;
+-   modais maiores que a tela.
+
+------------------------------------------------------------------------
+
+25. FIREBASE
+
+Utilizar Firebase Authentication para autenticação.
+
+Utilizar Firestore para dados.
+
+Utilizar Storage somente quando necessário.
+
+Utilizar Firebase Admin SDK somente no backend.
+
+Variáveis públicas do frontend:
+
+VITE_FIREBASE_API_KEY
+
+VITE_FIREBASE_AUTH_DOMAIN
+
+VITE_FIREBASE_PROJECT_ID
+
+VITE_FIREBASE_STORAGE_BUCKET
+
+VITE_FIREBASE_MESSAGING_SENDER_ID
+
+VITE_FIREBASE_APP_ID
+
+Variáveis privadas:
+
+FIREBASE_SERVICE_ACCOUNT_JSON
+
+APP_DATA_ENCRYPTION_KEY
+
+Nunca expor variáveis privadas no frontend.
+
+Nunca utilizar:
+
+VITE_FIREBASE_SERVICE_ACCOUNT_JSON
+
+ou qualquer outra variável com credenciais administrativas no frontend.
+
+------------------------------------------------------------------------
+
+26. FIREBASE ADMIN
+
+Operações administrativas devem utilizar Firebase Admin SDK no backend.
+
+O backend deve validar:
+
+-   usuário autenticado;
+-   identidade;
+-   loja;
+-   papel;
+-   permissões.
+
+Não confiar em:
+
+-   role enviado pelo frontend;
+-   storeId enviado pelo frontend;
+-   campos ocultos;
+-   localStorage;
+-   sessionStorage.
+
+------------------------------------------------------------------------
+
+27. SEGURANÇA MULTI-TENANT
+
+Toda operação deve validar o tenant.
+
+Exemplo conceitual:
+
+request.auth.uid → usuário → storeId → recurso
+
+Um usuário não pode simplesmente alterar:
+
+storeId
+
+no frontend para acessar outra loja.
+
+As regras Firestore e APIs devem impedir acesso cruzado.
+
+------------------------------------------------------------------------
+
+28. FIRESTORE
+
+Criar estrutura organizada.
+
+Exemplo conceitual:
+
+stores/{storeId}
+
+stores/{storeId}/users/{userId}
+
+stores/{storeId}/customers/{customerId}
+
+stores/{storeId}/devices/{deviceId}
+
+stores/{storeId}/serviceOrders/{orderId}
+
+stores/{storeId}/products/{productId}
+
+stores/{storeId}/sales/{saleId}
+
+stores/{storeId}/cash/{cashId}
+
+stores/{storeId}/finance/{financeId}
+
+ou uma estrutura equivalente, desde que mantenha isolamento rigoroso por
+loja.
+
+------------------------------------------------------------------------
+
+29. REGRAS DE SEGURANÇA
+
+Criar Firestore Security Rules rigorosas.
+
+Requisitos:
+
+-   usuário não autenticado não acessa dados;
+-   usuário comum só acessa a própria loja;
+-   Admin possui permissões administrativas somente dentro da própria
+    loja;
+-   Técnico não administra estoque;
+-   Vendedor não administra configurações globais;
+-   nenhum usuário comum pode acessar outra loja;
+-   nenhum usuário pode se tornar Super Admin pelo frontend.
+
+Super Admin deve ser identificado por mecanismo seguro definido no
+backend/Firestore.
+
+------------------------------------------------------------------------
+
+30. API
+
+Criar APIs protegidas para operações sensíveis.
+
+Exemplos:
+
+/api/admin/lojas
+
+/api/admin/users
+
+/api/admin/plans
+
+/api/admin/subscriptions
+
+As APIs devem:
+
+1.  verificar autenticação;
+2.  validar autorização;
+3.  validar tenant;
+4.  validar entrada;
+5.  executar operação;
+6.  retornar erros estruturados.
+
+Nunca retornar segredos.
+
+------------------------------------------------------------------------
+
+31. TRATAMENTO DE ERROS
+
+Implementar tratamento de erros consistente.
+
+Nunca mostrar ao usuário:
+
+-   stack trace;
+-   credenciais;
+-   tokens;
+-   detalhes internos do Firebase;
+-   JSON de service account.
+
+No frontend mostrar mensagens úteis, por exemplo:
+
+“Não foi possível criar a loja. Verifique os dados e tente novamente.”
+
+No backend registrar detalhes técnicos nos logs.
+
+------------------------------------------------------------------------
+
+32. VALIDAÇÃO
+
+Validar formulários no frontend e backend.
+
+Nunca confiar somente na validação do frontend.
+
+Validar:
+
+-   email;
+-   telefone;
+-   valores;
+-   datas;
+-   IDs;
+-   permissões;
+-   campos obrigatórios;
+-   relacionamentos;
+-   estoque disponível.
+
+------------------------------------------------------------------------
+
+33. DASHBOARD E CÁLCULOS
+
+Todos os indicadores devem ser derivados de dados reais.
+
+Não utilizar:
+
+-   números fictícios;
+-   dados mockados em produção;
+-   valores hardcoded.
+
+Durante desenvolvimento, mocks podem existir somente quando
+explicitamente separados do ambiente de produção.
+
+------------------------------------------------------------------------
+
+34. ESTADOS DA INTERFACE
+
+Todos os módulos devem possuir:
+
+-   loading;
+-   empty state;
+-   error state;
+-   success feedback;
+-   confirmação de exclusão;
+-   skeleton quando apropriado.
+
+Exemplo:
+
+Nenhuma OS encontrada:
+
+“Você ainda não possui ordens de serviço.”
+
+------------------------------------------------------------------------
+
+35. ROTAS PROTEGIDAS
+
+Criar proteção por autenticação.
+
+Exemplos:
+
+/login
+
+/dashboard
+
+/os
+
+/clientes
+
+/estoque
+
+/vendas
+
+/caixa
+
+/financeiro
+
+/equipe
+
+/configuracoes
+
+/super-admin
+
+Usuário não autenticado deve ser redirecionado para login.
+
+Usuário sem permissão deve receber acesso negado e não apenas esconder
+visualmente o botão.
+
+------------------------------------------------------------------------
+
+36. SUPER ADMIN — REGRA FINAL
+
+Esta regra tem prioridade sobre qualquer outra instrução relacionada ao
+Super Admin:
+
+O sistema não cria Super Admin.
+
+O sistema não possui cadastro público de Super Admin.
+
+O sistema não possui botão para criar Super Admin.
+
+O sistema não possui script obrigatório para criar Super Admin.
+
+O usuário Super Admin será criado manualmente no:
+
+Firebase Console → Authentication → Users
+
+A aplicação somente reconhecerá como Super Admin o usuário que estiver
+explicitamente autorizado pelo mecanismo seguro escolhido para essa
+finalidade.
+
+Nenhum Admin, Vendedor ou Técnico poderá elevar seus próprios
+privilégios.
+
+------------------------------------------------------------------------
+
+37. VERCEL
+
+O projeto deve ser compatível com Vercel.
+
+Build:
+
+npm run build
+
+Output:
+
+dist
+
+O projeto deve funcionar em produção sem depender de execução local.
+
+As API Routes devem funcionar corretamente no ambiente Vercel.
+
+Não utilizar caminhos absolutos locais.
+
+Não depender de arquivos existentes somente no computador do
+desenvolvedor.
+
+------------------------------------------------------------------------
+
+38. VARIÁVEIS DE AMBIENTE
+
+Frontend:
+
+VITE_FIREBASE_API_KEY
+
+VITE_FIREBASE_AUTH_DOMAIN
+
+VITE_FIREBASE_PROJECT_ID
+
+VITE_FIREBASE_STORAGE_BUCKET
+
+VITE_FIREBASE_MESSAGING_SENDER_ID
+
+VITE_FIREBASE_APP_ID
+
+Backend:
+
+FIREBASE_SERVICE_ACCOUNT_JSON
+
+APP_DATA_ENCRYPTION_KEY
+
+As variáveis privadas nunca podem ser expostas ao navegador.
+
+------------------------------------------------------------------------
+
+39. README E ENTREGA DO PROJETO
+
+Entregar o projeto completo, com código-fonte organizado, dependências
+declaradas, configuração de produção, regras de segurança, APIs,
+estrutura de dados e arquivos necessários para build e deploy. Não
+entregar apenas telas, protótipos, pseudocódigo ou funcionalidades
+simuladas. Não afirmar que algo foi testado se não foi executado.
+
+O README deve ser objetivo e explicar SOMENTE o que o usuário precisa
+fazer no Firebase e na Vercel para configurar e publicar o projeto:
+- configurar Firebase Authentication e os métodos de login utilizados;
+- configurar Firestore e publicar Security Rules e índices necessários;
+- configurar Storage caso seja utilizado;
+- criar/configurar manualmente o Super Admin no Firebase Console e
+  aplicar a autorização segura no backend;
+- configurar as variáveis de ambiente na Vercel, separando variáveis
+  públicas do frontend e segredos privados do backend;
+- configurar API Routes/backend e credenciais Firebase Admin de forma
+  segura;
+- conectar o repositório/projeto e realizar deploy na Vercel;
+- executar build e verificar o domínio publicado;
+- indicar claramente qualquer configuração manual necessária.
+
+Não transformar o README em tutorial básico de programação, navegador,
+criação de conta comum ou instalação de editor. O foco é explicar
+somente as etapas necessárias no Firebase e na Vercel para colocar o
+sistema em produção.
+
+Antes da entrega, executar os testes e a build disponíveis, corrigir os
+erros encontrados e informar com honestidade o que foi validado e o que
+ainda depende de configuração do usuário. Nunca incluir service
+account, chaves privadas, senhas, tokens ou outros segredos no código
+público, README ou frontend.
+
+40. QUALIDADE DO CÓDIGO
+
+O projeto deve:
+
+-   evitar duplicação;
+-   possuir componentes reutilizáveis;
+-   separar frontend/backend;
+-   centralizar permissões;
+-   centralizar tratamento de erros;
+-   utilizar funções utilitárias;
+-   evitar código morto;
+-   evitar imports não utilizados;
+-   evitar warnings desnecessários;
+-   evitar console.log de informações sensíveis.
+
+Antes de considerar o projeto finalizado:
+
+-   revisar rotas;
+-   revisar autenticação;
+-   revisar permissões;
+-   revisar Firestore;
+-   revisar APIs;
+-   revisar responsividade;
+-   revisar dark/light mode;
+-   revisar cálculos;
+-   revisar criação de loja;
+-   revisar Super Admin.
+
+------------------------------------------------------------------------
+
+41. PRIORIDADE DE IMPLEMENTAÇÃO
+
+A solicitação é reconstruir o projeto do zero, utilizando este prompt
+como especificação completa. Antes de implementar, inspecionar o
+ambiente e os arquivos disponíveis apenas para compreender limitações
+técnicas e evitar conflitos; não preservar a implementação antiga como
+requisito. Não reutilizar código defeituoso apenas por existir.
+
+O objetivo é entregar uma primeira versão integrada de todos os módulos
+listados, sem deixar telas fictícias, botões sem ação ou fluxos
+essenciais incompletos. Desenvolver o sistema de ponta a ponta e validar
+cada módulo durante a construção, seguindo esta ordem técnica:
+
+1.  Estrutura do projeto e configuração;
+2.  Firebase e variáveis de ambiente;
+3.  autenticação;
+4.  autorização e papéis, incluindo Gerente;
+5.  multi-tenancy e regras de segurança;
+6.  Super Admin e criação segura de lojas;
+7.  planos e assinaturas;
+8.  usuários e equipe;
+9.  dashboard da loja;
+10. clientes e aparelhos;
+11. Ordens de Serviço;
+12. estoque e movimentações;
+13. vendas/PDV;
+14. caixa;
+15. financeiro da loja;
+16. dashboard financeiro do Super Admin, com receitas, previsão por
+    data/período e cadastro de custos;
+17. histórico de auditoria;
+18. alertas operacionais;
+19. garantia e retrabalho;
+20. Valor Parado em Aparelhos;
+21. tema dark/light;
+22. responsividade;
+23. testes de permissões e isolamento;
+24. tratamento de erros;
+25. revisão geral;
+26. build e deploy Vercel.
+
+Embora a entrega seja integrada, não pular testes intermediários. Não
+declarar o sistema pronto se algum módulo essencial for apenas visual,
+usar dados mockados em produção ou não persistir corretamente no
+Firebase. Se algum requisito não puder ser concluído no ambiente
+disponível, informar exatamente o que falta, por que falta e como
+configurar, sem fingir que está funcionando.
+
+------------------------------------------------------------------------
+
+42. REGRA DE PRODUÇÃO
+
+Não considerar uma funcionalidade concluída apenas porque a tela
+aparece.
+
+Uma funcionalidade somente deve ser considerada concluída quando:
+
+-   frontend funciona;
+-   backend funciona;
+-   Firebase funciona;
+-   permissões funcionam;
+-   persistência funciona;
+-   tratamento de erros funciona;
+-   funciona em mobile;
+-   funciona em produção;
+-   registra responsáveis em vendas, OS e movimentações relevantes;
+-   mostra histórico de auditoria aos usuários autorizados da loja;
+-   possui central de alertas funcional;
+-   permite alterar preços e promoções com histórico;
+-   diferencia previsões de recebimentos confirmados no Super Admin;
+-   não permite acesso indevido.
+
+------------------------------------------------------------------------
+
+43. RESULTADO ESPERADO
+
+Entregar um SaaS chamado FixFlowOS, profissional, responsivo, seguro e
+pronto para produção, com arquitetura multi-tenant e integração real com
+Firebase + Vercel.
+
+O sistema deve ser adequado para operação real de assistência técnica.
+
+Priorizar:
+
+segurança + estabilidade + mobile + simplicidade + velocidade +
+experiência profissional.
+
+A regra mais importante é:
+
+nenhum usuário consegue acessar dados de outra loja ou elevar seus
+próprios privilégios.
+
+E especificamente:
+
+Super Admin é criado exclusivamente pelo Firebase e nunca pela interface
+pública do FixFlowOS.
+
+DIRETRIZ FINAL DE ENTREGA INTEGRADA
+
+A entrega solicitada é uma reconstrução completa do FixFlowOS, com todos
+os módulos especificados integrados em uma única aplicação. Não entregar
+somente protótipo, telas demonstrativas ou uma lista de tarefas.
+Implementar o máximo funcional possível no ambiente, executar build e
+testes disponíveis, corrigir erros encontrados e entregar instruções
+objetivas para configuração e deploy.
+
+Não remover funcionalidades especificadas para simplificar a
+implementação. Se houver conflito técnico real, priorizar segurança,
+integridade dos dados, isolamento entre lojas e consistência financeira,
+explicando a limitação e oferecendo uma solução compatível.
+
+Antes da entrega, conferir explicitamente: - perfil Gerente e suas
+permissões reais no frontend, backend e Firestore; - edição completa de
+OS pelo Gerente, com registro de auditoria; - controle de estoque e
+movimentações; - painel financeiro do Super Admin com filtros por data,
+previsão de recebimentos, receitas recebidas, despesas, custos
+recorrentes e resultado estimado; - separação entre finanças da
+plataforma e finanças das lojas; - alertas de estoque, OS, garantias e
+vencimentos; - controle de garantia e retrabalho; - nenhum dado fictício
+em produção; - nenhuma rota sensível protegida apenas pela interface; -
+nenhuma credencial administrativa no frontend; - funcionamento
+responsivo e build de produção.
+
+O resultado deve ser moderno, bonito, claro, consistente e confiável,
+sem excesso de elementos visuais. O dashboard deve ter hierarquia visual
+forte, gráficos úteis, cartões com indicadores, filtros intuitivos,
+estados vazios bem desenhados e ótima experiência em celular e desktop.
+
+
+========================================================================
+ADENDO V3 — EXPANSÃO OBRIGATÓRIA DO FIXFLOWOS
+========================================================================
+
+IMPORTANTE:
+Este adendo NÃO substitui, remove ou simplifica nenhum requisito do
+Prompt Mestre original. Todos os requisitos anteriores permanecem
+obrigatórios. Este adendo apenas amplia a especificação.
+
+A entrega final deve continuar sendo o FixFlowOS completo, funcional,
+integrado, multi-tenant, responsivo, seguro e pronto para produção.
+
+------------------------------------------------------------------------
+44. VENDA/ATENDIMENTO TÉCNICO — VENDEDOR TÉCNICO
+------------------------------------------------------------------------
+
+Adicionar oficialmente um quinto perfil operacional dentro da loja:
+
+VENDEDOR TÉCNICO
+
+Os papéis da loja passam a ser:
+
+- ADMIN;
+- GERENTE;
+- VENDEDOR;
+- TÉCNICO;
+- VENDEDOR TÉCNICO.
+
+O Vendedor Técnico é um perfil híbrido de atendimento/vendas e operação
+técnica.
+
+Ele combina as capacidades operacionais permitidas ao Vendedor e ao
+Técnico, sem receber automaticamente poderes administrativos de Gerente
+ou Admin.
+
+Pode, conforme as permissões definidas:
+
+ATENDIMENTO E VENDAS
+- cadastrar clientes;
+- editar clientes;
+- consultar clientes;
+- abrir OS;
+- editar OS;
+- realizar vendas;
+- adicionar produtos e serviços ao PDV;
+- selecionar cliente;
+- aplicar desconto quando autorizado;
+- selecionar método de pagamento;
+- finalizar venda;
+- consultar vendas próprias e informações necessárias ao atendimento;
+- consultar produtos e disponibilidade.
+
+OPERAÇÃO TÉCNICA
+- visualizar OS;
+- criar OS;
+- editar OS;
+- atualizar etapas técnicas;
+- registrar diagnóstico;
+- adicionar observações;
+- registrar serviços executados;
+- acompanhar reparos;
+- realizar testes;
+- atualizar status técnico;
+- consultar disponibilidade de peças;
+- registrar informações técnicas permitidas.
+
+O Vendedor Técnico NÃO recebe automaticamente:
+- administração geral do estoque;
+- ajuste manual de estoque;
+- cadastro/edição administrativa de categorias;
+- gestão de usuários;
+- administração de permissões;
+- configurações críticas;
+- gestão administrativa do financeiro;
+- poderes de Gerente;
+- poderes de Admin;
+- poderes de Super Admin.
+
+Toda permissão adicional deve ser explicitamente autorizada pelo
+backend e pelas regras de segurança.
+
+O Vendedor Técnico deve aparecer nos relatórios, rankings, histórico,
+auditoria, indicadores de vendas e indicadores técnicos quando houver
+dados correspondentes.
+
+------------------------------------------------------------------------
+45. HISTÓRICO GERAL DA LOJA / DIÁRIO OPERACIONAL
+------------------------------------------------------------------------
+
+Além do histórico de auditoria já especificado, criar uma área de alto
+nível chamada:
+
+"HISTÓRICO GERAL DA LOJA"
+
+ou
+
+"DIÁRIO DA LOJA"
+
+O objetivo é permitir que o dono/Admin tenha uma visão completa do que
+está acontecendo na operação.
+
+O histórico deve consolidar eventos reais da loja, respeitando as
+permissões e o tenant.
+
+Registrar, quando aplicável:
+
+- login e eventos relevantes de acesso;
+- clientes cadastrados;
+- clientes editados;
+- aparelhos cadastrados;
+- OS criadas;
+- OS editadas;
+- OS atribuídas;
+- mudanças de status;
+- diagnósticos;
+- serviços executados;
+- peças/insumos utilizados;
+- OS concluídas;
+- OS entregues;
+- OS canceladas;
+- retornos em garantia;
+- retrabalhos;
+- vendas;
+- produtos vendidos;
+- serviços vendidos;
+- descontos;
+- pagamentos;
+- cancelamentos;
+- trocas;
+- devoluções;
+- entradas de estoque;
+- saídas de estoque;
+- ajustes de estoque;
+- transferências/movimentações quando aplicável;
+- alterações de preço;
+- alterações de custo;
+- despesas;
+- receitas;
+- contas pagas;
+- contas recebidas;
+- abertura e fechamento de caixa;
+- sangrias;
+- suprimentos;
+- alterações de usuários;
+- ativação/desativação de usuários;
+- alterações de permissões;
+- alterações de configurações;
+- aparelhos próprios adquiridos;
+- aparelhos próprios em reparo;
+- aparelhos próprios vendidos;
+- custos adicionados a aparelhos próprios;
+- mudanças de preço de venda de aparelhos próprios;
+- alterações de garantia;
+- demais eventos relevantes da operação.
+
+Cada evento deve possuir:
+- usuário responsável;
+- papel do usuário no momento;
+- data e hora;
+- tipo de evento;
+- entidade relacionada;
+- identificador;
+- descrição legível;
+- dados anteriores/posteriores quando aplicável;
+- justificativa quando aplicável;
+- loja/tenant.
+
+A tela deve possuir:
+- busca;
+- filtros por data;
+- filtros por usuário;
+- filtros por papel;
+- filtros por tipo de evento;
+- filtros por módulo;
+- filtros por OS;
+- filtros por venda;
+- filtros por produto;
+- filtros por cliente;
+- filtros por aparelho;
+- filtros por aparelho próprio;
+- filtros financeiros;
+- ordenação cronológica.
+
+Exemplo visual:
+
+08:32 — João / Vendedor
+Cadastrou cliente Maria Silva.
+
+08:47 — João / Vendedor
+Criou OS #1045 para iPhone 13.
+
+09:10 — Carlos / Técnico
+Iniciou diagnóstico da OS #1045.
+
+09:42 — Carlos / Técnico
+Alterou OS #1045 para "Aguardando peça".
+
+10:05 — Pedro / Vendedor
+Realizou venda #302 no valor de R$ 850,00.
+
+10:16 — Ana / Gerente
+Registrou entrada de 10 películas no estoque.
+
+11:30 — Carlos / Técnico
+Concluiu reparo da OS #1040.
+
+O histórico deve ser somente acrescentado e protegido contra alteração
+ou exclusão por usuários comuns.
+
+Não registrar:
+- senhas;
+- tokens;
+- service accounts;
+- credenciais;
+- segredos;
+- dados sensíveis desnecessários.
+
+------------------------------------------------------------------------
+46. DESEMPENHO E RANKING DA EQUIPE
+------------------------------------------------------------------------
+
+Criar módulo:
+
+"Desempenho da Equipe"
+
+Permitir ao Admin e usuários autorizados consultar indicadores por
+funcionário.
+
+Filtros:
+- hoje;
+- ontem;
+- últimos 7 dias;
+- últimos 30 dias;
+- mês atual;
+- mês anterior;
+- ano;
+- intervalo personalizado.
+
+VENDEDORES
+Mostrar:
+- quantidade de vendas;
+- faturamento bruto;
+- descontos;
+- devoluções;
+- cancelamentos;
+- faturamento líquido;
+- ticket médio;
+- produtos vendidos;
+- serviços vendidos;
+- quantidade de OS abertas;
+- clientes atendidos.
+
+TÉCNICOS
+Mostrar:
+- OS recebidas;
+- OS em andamento;
+- OS concluídas;
+- OS entregues;
+- tempo médio de reparo;
+- serviços executados;
+- diagnósticos realizados;
+- aparelhos em testes;
+- retrabalhos;
+- retornos de garantia;
+- valor dos serviços executados.
+
+VENDEDOR TÉCNICO
+Mostrar separadamente:
+- indicadores de vendas;
+- indicadores técnicos;
+- indicadores combinados.
+
+GERENTE
+Mostrar, conforme os dados disponíveis:
+- OS gerenciadas;
+- atribuições;
+- movimentações de estoque;
+- vendas;
+- alterações relevantes;
+- atividades administrativas;
+- indicadores operacionais.
+
+Não criar métricas fictícias.
+Não transformar automaticamente os rankings em avaliação trabalhista.
+Os dados devem representar somente fatos registrados no sistema.
+
+------------------------------------------------------------------------
+47. RANKING DA LOJA
+------------------------------------------------------------------------
+
+Criar uma área opcional:
+
+"Ranking da Loja"
+
+Categorias possíveis:
+- maior vendedor;
+- maior faturamento;
+- maior ticket médio;
+- técnico com mais OS concluídas;
+- técnico com menor tempo médio de reparo;
+- maior quantidade de serviços executados;
+- maior quantidade de aparelhos concluídos;
+- funcionário com maior valor de vendas;
+- produtos mais vendidos;
+- serviços mais vendidos;
+- funcionário com mais descontos;
+- funcionário com mais devoluções;
+- retrabalhos por funcionário.
+
+Todos os rankings devem ser baseados em dados reais e permitir filtro
+por período.
+
+------------------------------------------------------------------------
+48. MÓDULO — APARELHOS PRÓPRIOS DA LOJA
+------------------------------------------------------------------------
+
+Criar um módulo independente chamado:
+
+"APARELHOS DA LOJA"
+
+Esse módulo representa aparelhos pertencentes à própria loja,
+destinados a:
+- reforma;
+- preparação;
+- estoque;
+- revenda;
+- troca;
+- outras operações comerciais próprias.
+
+REGRA FUNDAMENTAL:
+
+Aparelhos próprios da loja NÃO devem ser misturados com aparelhos de
+clientes em Ordens de Serviço de conserto.
+
+Devem existir fluxos e indicadores separados para:
+
+A) OS DE CLIENTES / CONSERTO
+B) APARELHOS PRÓPRIOS / REVENDA
+
+Usuários autorizados:
+- Admin;
+- Gerente;
+- Técnico;
+- Vendedor Técnico;
+
+conforme as permissões operacionais definidas.
+
+O Vendedor comum não recebe automaticamente permissão para gerenciar
+reparo técnico de aparelhos próprios.
+
+------------------------------------------------------------------------
+49. OS DE APARELHOS PRÓPRIOS
+------------------------------------------------------------------------
+
+Criar uma ordem específica para cada aparelho próprio da loja.
+
+Campos:
+- número/ID;
+- marca;
+- modelo;
+- IMEI;
+- número de série;
+- cor;
+- capacidade;
+- saúde da bateria quando aplicável;
+- acessórios;
+- condição física;
+- fotos;
+- origem;
+- fornecedor/pessoa de origem;
+- data de aquisição;
+- custo de aquisição;
+- valor atribuído em troca quando aplicável;
+- observações;
+- responsável pela aquisição;
+- técnico responsável;
+- status;
+- custos adicionais;
+- preço pretendido;
+- preço anunciado;
+- preço final de venda;
+- data de venda;
+- comprador quando aplicável;
+- lucro potencial;
+- lucro realizado;
+- margem;
+- histórico.
+
+STATUS:
+1. Comprado
+2. Em avaliação
+3. Aguardando reparo
+4. Em reparo
+5. Aguardando peça
+6. Em testes
+7. Pronto para venda
+8. Anunciado
+9. Reservado
+10. Vendido
+11. Cancelado
+
+Toda alteração deve gerar histórico.
+
+------------------------------------------------------------------------
+50. CUSTO REAL DOS APARELHOS PRÓPRIOS
+------------------------------------------------------------------------
+
+Calcular o custo real do aparelho.
+
+Custo total deve poder considerar:
+- custo de aquisição;
+- peças utilizadas;
+- acessórios adicionados;
+- mão de obra quando configurada;
+- outros custos;
+- custos adicionais registrados.
+
+Exemplo:
+
+Aquisição: R$ 1.800
+Peças: R$ 250
+Outros custos: R$ 100
+
+Custo total:
+R$ 2.150
+
+Preço de venda pretendido:
+R$ 2.699
+
+Lucro potencial:
+R$ 549
+
+Margem:
+20,34%
+
+Fórmulas e critérios devem ser transparentes.
+
+Diferenciar obrigatoriamente:
+- custo total;
+- preço pretendido;
+- preço anunciado;
+- valor reservado;
+- valor efetivamente vendido;
+- lucro potencial;
+- lucro realizado.
+
+Não considerar venda prevista como venda realizada.
+
+------------------------------------------------------------------------
+51. PEÇAS DO ESTOQUE UTILIZADAS EM APARELHOS PRÓPRIOS
+------------------------------------------------------------------------
+
+Quando uma peça do estoque da loja for utilizada em um aparelho próprio,
+permitir registrar a movimentação.
+
+A movimentação deve informar:
+- produto;
+- quantidade;
+- custo unitário;
+- custo total;
+- aparelho próprio de destino;
+- usuário;
+- data/hora;
+- origem;
+- justificativa quando aplicável.
+
+Exemplo:
+
+Tela iPhone 13
+Quantidade: 1
+Custo: R$ 320
+Destino: Aparelho próprio #001
+
+A movimentação deve afetar o estoque real e o custo do aparelho próprio.
+
+------------------------------------------------------------------------
+52. APARELHO RECEBIDO COMO PARTE DE PAGAMENTO / TROCA
+------------------------------------------------------------------------
+
+Permitir registrar aparelho recebido em:
+- troca;
+- parte de pagamento;
+- negociação;
+- compra direta;
+- outra origem autorizada.
+
+Registrar:
+- valor atribuído ao aparelho;
+- operação de origem;
+- cliente relacionado quando aplicável;
+- custo considerado para a loja;
+- custos posteriores;
+- preço de venda;
+- lucro potencial;
+- lucro realizado.
+
+------------------------------------------------------------------------
+53. FOTOS E DOCUMENTAÇÃO DE APARELHOS PRÓPRIOS
+------------------------------------------------------------------------
+
+Permitir anexar:
+- foto frontal;
+- foto traseira;
+- laterais;
+- tela;
+- defeitos;
+- acessórios;
+- IMEI;
+- etiqueta;
+- comprovantes;
+- outros documentos relevantes.
+
+Utilizar Firebase Storage quando necessário, com acesso protegido.
+
+------------------------------------------------------------------------
+54. DASHBOARD DE APARELHOS PRÓPRIOS
+------------------------------------------------------------------------
+
+Criar dashboard com:
+
+- quantidade de aparelhos próprios;
+- aparelhos em avaliação;
+- aparelhos em reparo;
+- aparelhos aguardando peça;
+- aparelhos em testes;
+- aparelhos prontos;
+- aparelhos anunciados;
+- aparelhos reservados;
+- aparelhos vendidos;
+- valor total investido;
+- custo total;
+- valor potencial de venda;
+- lucro potencial;
+- lucro realizado;
+- margem média;
+- aparelhos parados;
+- tempo médio em estoque.
+
+Criar tabela detalhada com:
+- aparelho;
+- custo;
+- preço previsto;
+- lucro potencial;
+- margem;
+- status;
+- responsável;
+- tempo parado.
+
+------------------------------------------------------------------------
+55. ALERTAS DE APARELHOS PRÓPRIOS
+------------------------------------------------------------------------
+
+Criar alertas para:
+- aparelho parado por muitos dias;
+- aparelho com custo acima do limite definido;
+- margem abaixo do mínimo configurado;
+- aparelho pronto mas ainda não anunciado;
+- aparelho anunciado há muito tempo;
+- aparelho aguardando peça;
+- aparelho com reparo atrasado;
+- aparelho reservado;
+- aparelho vendido sem conclusão do fluxo;
+- inconsistência de estoque/custo.
+
+------------------------------------------------------------------------
+56. RENTABILIDADE DE SERVIÇOS
+------------------------------------------------------------------------
+
+Criar análise de rentabilidade dos serviços.
+
+Para cada serviço permitir calcular:
+- preço cobrado;
+- custo de peças;
+- custo de mão de obra quando configurado;
+- outros custos;
+- custo total;
+- lucro;
+- margem.
+
+Exemplo:
+
+Serviço: Troca de tela
+Preço: R$ 650
+Peça: R$ 320
+Mão de obra: R$ 80
+Custo: R$ 400
+Lucro: R$ 250
+Margem: 38,46%
+
+Permitir ranking de:
+- serviços mais vendidos;
+- serviços com maior faturamento;
+- serviços com maior lucro;
+- serviços com maior margem.
+
+------------------------------------------------------------------------
+57. RENTABILIDADE DE PRODUTOS
+------------------------------------------------------------------------
+
+Para produtos vendidos pela loja, permitir visualizar:
+- custo;
+- preço;
+- quantidade vendida;
+- faturamento;
+- descontos;
+- devoluções;
+- custo total;
+- lucro;
+- margem.
+
+Permitir identificar:
+- produtos mais vendidos;
+- produtos que mais faturam;
+- produtos que mais geram lucro;
+- produtos com maior margem;
+- produtos com baixa rentabilidade.
+
+------------------------------------------------------------------------
+58. VISÃO "O QUE ESTÁ ACONTECENDO NA LOJA?"
+------------------------------------------------------------------------
+
+Criar uma visão executiva:
+
+"VISÃO GERAL DA LOJA"
+
+Objetivo:
+permitir que o dono compreenda a situação da loja rapidamente.
+
+Mostrar, com dados reais:
+
+OPERACIONAL
+- OS abertas;
+- OS em andamento;
+- OS atrasadas;
+- OS prontas;
+- OS entregues;
+- aparelhos próprios em reparo;
+- aparelhos próprios prontos.
+
+VENDAS
+- vendas do período;
+- faturamento;
+- ticket médio;
+- vendedor líder;
+- produtos mais vendidos;
+- serviços mais vendidos.
+
+TÉCNICO
+- OS concluídas;
+- técnico com maior produção;
+- tempo médio de reparo;
+- retrabalhos;
+- garantias.
+
+ESTOQUE
+- valor do estoque;
+- produtos abaixo do mínimo;
+- movimentações recentes;
+- peças críticas.
+
+FINANCEIRO
+- receitas;
+- despesas;
+- saldo;
+- contas vencidas;
+- contas próximas;
+- lucro conforme metodologia financeira já definida.
+
+APARELHOS PRÓPRIOS
+- capital investido;
+- valor potencial;
+- lucro potencial;
+- lucro realizado;
+- aparelhos parados.
+
+ATIVIDADE RECENTE
+Exibir eventos recentes da loja.
+
+------------------------------------------------------------------------
+59. ATIVIDADE POR FUNCIONÁRIO
+------------------------------------------------------------------------
+
+Criar tela:
+
+"ATIVIDADE DO FUNCIONÁRIO"
+
+Permitir selecionar um funcionário e visualizar:
+- vendas;
+- OS;
+- alterações;
+- diagnósticos;
+- serviços;
+- movimentações;
+- descontos;
+- devoluções;
+- pagamentos;
+- atividades técnicas;
+- atividades administrativas;
+- aparelhos próprios trabalhados;
+- demais eventos permitidos.
+
+Exibir por período e em linha do tempo.
+
+------------------------------------------------------------------------
+60. REGRAS DE PERMISSÃO PARA OS APARELHOS PRÓPRIOS
+------------------------------------------------------------------------
+
+Admin:
+- acesso completo.
+
+Gerente:
+- acesso operacional completo ao módulo conforme permissão;
+- pode acompanhar custos, reparos, estoque relacionado e venda.
+
+Técnico:
+- pode trabalhar tecnicamente nos aparelhos próprios;
+- diagnosticar;
+- atualizar reparo;
+- registrar serviço;
+- consultar peças;
+- registrar consumo conforme fluxo autorizado.
+
+Vendedor Técnico:
+- pode atuar no atendimento/comercial;
+- pode trabalhar tecnicamente;
+- pode atualizar as etapas técnicas permitidas;
+- pode consultar custos e preço quando autorizado;
+- não recebe automaticamente poderes administrativos de estoque.
+
+Vendedor:
+- pode consultar aparelhos liberados para venda;
+- pode vender aparelhos próprios quando autorizado;
+- não administra reparos técnicos nem custos internos por padrão.
+
+Nenhum usuário pode acessar aparelhos de outra loja.
+
+------------------------------------------------------------------------
+61. ENTREGA OBRIGATÓRIA — PROJETO PRONTO PARA PRODUÇÃO
+------------------------------------------------------------------------
+
+REGRA FUNDAMENTAL DE ENTREGA:
+
+O desenvolvedor/equipe deve entregar o FixFlowOS como um projeto
+funcional e pronto para ser colocado em produção.
+
+NÃO entregar:
+- somente protótipo;
+- somente frontend;
+- somente telas;
+- telas estáticas;
+- dados simulados em produção;
+- botões sem ação;
+- APIs fictícias;
+- funções "TODO";
+- funcionalidades descritas mas não implementadas;
+- código incompleto;
+- fluxos essenciais dependentes de implementação posterior.
+
+Quando o projeto for entregue, o proprietário deverá precisar
+principalmente:
+1. configurar o Firebase;
+2. configurar as variáveis de ambiente;
+3. configurar o Super Admin conforme a regra original;
+4. configurar a Vercel;
+5. publicar o projeto.
+
+Não exigir que o proprietário termine o desenvolvimento.
+
+O projeto entregue deve conter:
+- frontend;
+- backend/API Routes;
+- autenticação;
+- autorização;
+- multi-tenancy;
+- Firestore;
+- regras de segurança;
+- índices;
+- Storage quando necessário;
+- estrutura de dados;
+- todos os módulos;
+- todos os perfis;
+- Vendedor Técnico;
+- dashboards;
+- histórico;
+- auditoria;
+- alertas;
+- aparelhos próprios;
+- rentabilidade;
+- relatórios;
+- tratamento de erros;
+- responsividade;
+- dark/light mode;
+- build de produção.
+
+------------------------------------------------------------------------
+62. REGRA DE FUNCIONALIDADE REAL
+------------------------------------------------------------------------
+
+Uma funcionalidade somente é considerada implementada quando:
+- a interface funciona;
+- o backend funciona;
+- a autorização funciona;
+- a persistência funciona;
+- o Firestore funciona;
+- os dados permanecem após recarregar;
+- as permissões são respeitadas;
+- o histórico é registrado;
+- o tratamento de erros funciona;
+- o fluxo funciona em produção;
+- o fluxo funciona em mobile quando aplicável.
+
+Não considerar uma tela pronta simplesmente porque ela abre.
+
+Se existe um botão:
+ele deve executar a ação real.
+
+Se existe um formulário:
+ele deve salvar os dados reais.
+
+Se existe um relatório:
+ele deve consultar dados reais.
+
+Se existe um indicador:
+ele deve ser calculado com dados reais.
+
+Se existe uma permissão:
+ela deve ser validada no backend/Firestore.
+
+------------------------------------------------------------------------
+63. CHECKLIST OBRIGATÓRIO ANTES DA ENTREGA
+------------------------------------------------------------------------
+
+Antes de entregar o projeto, executar testes disponíveis e validar:
+
+AUTENTICAÇÃO
+- login;
+- logout;
+- proteção de rotas;
+- recuperação/alteração conforme fluxo implementado.
+
+PERMISSÕES
+- Admin;
+- Gerente;
+- Vendedor;
+- Técnico;
+- Vendedor Técnico;
+- isolamento entre lojas;
+- tentativa de acesso indevido;
+- tentativa de elevação de privilégio.
+
+OS
+- criação;
+- edição;
+- status;
+- diagnóstico;
+- técnico;
+- valores;
+- pagamento;
+- histórico;
+- garantia;
+- retrabalho.
+
+CLIENTES
+- CRUD;
+- histórico;
+- aparelhos vinculados.
+
+ESTOQUE
+- produtos;
+- categorias;
+- entrada;
+- saída;
+- ajuste;
+- consumo;
+- alertas;
+- histórico.
+
+VENDAS
+- venda;
+- desconto;
+- pagamento;
+- devolução;
+- troca;
+- cancelamento;
+- relatórios.
+
+CAIXA
+- abertura;
+- fechamento;
+- entradas;
+- saídas;
+- conferência.
+
+FINANCEIRO
+- receitas;
+- despesas;
+- contas;
+- pagamentos;
+- vencimentos;
+- relatórios.
+
+EQUIPE
+- criação;
+- edição;
+- ativação/desativação;
+- funções;
+- permissões.
+
+HISTÓRICO
+- auditoria;
+- histórico geral;
+- atividade por funcionário;
+- filtros.
+
+APARELHOS PRÓPRIOS
+- aquisição;
+- avaliação;
+- reparo;
+- peças;
+- custos;
+- preço;
+- margem;
+- lucro potencial;
+- venda;
+- lucro realizado;
+- histórico.
+
+ALERTAS
+- estoque;
+- OS;
+- garantia;
+- financeiro;
+- aparelhos próprios.
+
+RESPONSIVIDADE
+Testar pelo menos:
+- 360px;
+- 375px;
+- 390px;
+- 414px;
+- tablet;
+- notebook;
+- desktop.
+
+BUILD
+Executar:
+npm run build
+
+Corrigir os erros encontrados antes da entrega.
+
+Nunca declarar que algo foi testado se não foi efetivamente executado.
+
+------------------------------------------------------------------------
+64. README DE PRODUÇÃO
+------------------------------------------------------------------------
+
+O README deve ser objetivo e voltado ao proprietário do sistema.
+
+Explicar somente:
+
+1. criação/configuração do Firebase;
+2. Authentication;
+3. Firestore;
+4. Security Rules;
+5. índices;
+6. Storage quando utilizado;
+7. criação/autorização segura do Super Admin;
+8. variáveis de ambiente;
+9. Firebase Admin;
+10. configuração da Vercel;
+11. deploy;
+12. build;
+13. verificações finais.
+
+O README não deve ensinar programação básica.
+
+Não incluir no projeto:
+- service account;
+- senhas;
+- tokens;
+- chaves privadas;
+- credenciais;
+- segredos.
+
+O proprietário deve conseguir seguir o README para colocar o projeto no
+ar sem precisar terminar funcionalidades ou programar módulos.
+
+------------------------------------------------------------------------
+65. CRITÉRIO FINAL DE ACEITE
+------------------------------------------------------------------------
+
+O FixFlowOS somente pode ser considerado entregue quando:
+
+- todos os módulos do Prompt Mestre original estiverem implementados;
+- todos os módulos deste adendo estiverem implementados;
+- Vendedor Técnico estiver implementado;
+- histórico geral estiver implementado;
+- desempenho da equipe estiver implementado;
+- aparelhos próprios estiverem implementados;
+- custos e rentabilidade estiverem implementados;
+- dados forem reais e persistidos;
+- permissões forem aplicadas no frontend, backend e Firestore;
+- multi-tenancy estiver seguro;
+- nenhuma credencial administrativa estiver no frontend;
+- build de produção passar;
+- erros encontrados forem corrigidos;
+- projeto estiver pronto para configuração do Firebase e Vercel;
+- não existirem módulos essenciais apenas como demonstração.
+
+A entrega deve ser de um SaaS funcional, não de um protótipo.
+
+------------------------------------------------------------------------
+66. REGRA FINAL DE INTEGRIDADE
+------------------------------------------------------------------------
+
+Este adendo é cumulativo.
+
+Nenhuma funcionalidade, regra, módulo, segurança, permissão ou requisito
+do Prompt Mestre original pode ser removido para implementar estas novas
+funções.
+
+Em caso de conflito:
+1. segurança;
+2. isolamento multi-tenant;
+3. integridade dos dados;
+4. consistência financeira;
+5. autorização no backend;
+6. histórico/auditoria;
+7. demais requisitos funcionais.
+
+O resultado final deve ser o FixFlowOS completo, profissional, seguro,
+responsivo, integrado e pronto para produção, ficando para o proprietário
+somente as configurações necessárias do Firebase, variáveis de ambiente,
+Super Admin e Vercel para publicação.
